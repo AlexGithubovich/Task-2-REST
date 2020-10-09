@@ -17,6 +17,10 @@ class User {
     const { id, name, login } = user;
     return { id, name, login };
   }
+  static toRequest(user) {
+    const { id, name, login, password } = user;
+    return { id, name, login, password };
+  }
 }
 
 module.exports = User;
