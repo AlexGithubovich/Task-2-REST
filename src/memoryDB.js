@@ -1,5 +1,6 @@
 const DB = {
-  users: []
+  users: [],
+  boards: []
 };
 
 const getAll = name => {
@@ -29,12 +30,13 @@ const updateEntity = (name, newData, id) => {
 };
 
 const deleteEntity = (name, id) => {
-  const oldEntity = getEntity(id, name);
+  const entity = getEntity(id, name);
 
-  if (oldEntity) {
-    DB[name] = DB[name].filter(entity => entity.id !== id);
+  if (entity) {
+    const index = DB[name].indexOf(entity);
+    DB[name] = [...DB[name].slice(0, index)];
   }
-  return oldEntity;
+  return entity;
 };
 module.exports = {
   getAll,

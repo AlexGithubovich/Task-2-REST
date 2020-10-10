@@ -1,11 +1,11 @@
 const DB = require('../../memoryDB');
 
 const getAll = async name => {
-  return DB.getAll(name);
+  return await DB.getAll(name);
 };
 
 const getUser = async id => {
-  const user = DB.getEntity(id, 'users');
+  const user = await DB.getEntity(id, 'users');
   if (!user) {
     throw new Error(`Cannot find user with id: ${id}`);
   }
@@ -17,7 +17,7 @@ const createUser = async user => {
 };
 
 const updateUser = async (id, user) => {
-  const newUser = DB.updateEntity('users', user, id);
+  const newUser = await DB.updateEntity('users', user, id);
   if (!newUser) {
     throw new Error(`Cannot find user with id: ${id}`);
   }
@@ -26,7 +26,7 @@ const updateUser = async (id, user) => {
 };
 
 const deleteUser = async id => {
-  const user = DB.deleteEntity('users', id);
+  const user = await DB.deleteEntity('users', id);
   if (!user) {
     throw new Error(`Cannot find user with id: ${id}`);
   }
