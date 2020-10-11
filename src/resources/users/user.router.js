@@ -14,7 +14,7 @@ router.route('/:id').get(async (req, res) => {
   const id = req.params.id;
   const user = await usersService.getUser(id);
 
-  res.status(200).json(user);
+  res.status(200).json(user[0]);
 });
 
 // Create user

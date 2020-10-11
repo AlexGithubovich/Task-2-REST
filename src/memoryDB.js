@@ -1,6 +1,7 @@
 const DB = {
   users: [],
-  boards: []
+  boards: [],
+  tasks: []
 };
 
 const getAll = name => {
@@ -9,8 +10,12 @@ const getAll = name => {
 
 const getEntity = (id, name) => {
   const entities = DB[name];
-
-  return entities.filter(entity => entity.id === id)[0];
+  const entity = entities.filter(entityLocal => entityLocal.id === id);
+  // console.log('entity',entity)
+  if (entity.length !== 0) {
+    return entity;
+  }
+  return false;
 };
 
 const createEntity = (name, data) => {
@@ -19,7 +24,7 @@ const createEntity = (name, data) => {
 };
 
 const updateEntity = (name, newData, id) => {
-  const oldEntity = getEntity(id, name);
+  const oldEntity = getEntity(id, name)[0];
 
   if (oldEntity) {
     const index = DB[name].indexOf(oldEntity);
@@ -31,17 +36,42 @@ const updateEntity = (name, newData, id) => {
 
 const deleteEntity = (name, id) => {
   const entity = getEntity(id, name);
-
+  // console.log('deleteEntity', entity)
   if (entity) {
-    const index = DB[name].indexOf(entity);
-    DB[name] = [...DB[name].slice(0, index)];
+    DB[name] = DB[name].filter(item => item.id !== id);
+    return true;
   }
-  return entity;
+  return false;
 };
+
+const deleteTasks = boardId => {
+  const tasks = getAll('tasks');
+  const tasksForDeletion = tasks.filter(task => task.boardId === boardId);
+  if (tasksForDeletion && tasksForDeletion.length !== 0) {
+    DB.tasks = DB.tasks.filter(item => item.boardId !== boardId);
+    return true;
+  }
+  return false;
+};
+const unassignTasks = userId => {
+  if (!DB.tasks) {
+    process.stderr.write(`Cannot unassign Tasks with id: ${userId}`);
+    return false;
+  }
+  DB.tasks
+    .filter(task => task)
+    .forEach(task => {
+      if (task.userId === userId) task.userId = null;
+    });
+  return true;
+};
+
 module.exports = {
   getAll,
   getEntity,
   createEntity,
   updateEntity,
-  deleteEntity
+  deleteEntity,
+  deleteTasks,
+  unassignTasks
 };
