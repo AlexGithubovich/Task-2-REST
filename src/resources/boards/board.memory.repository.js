@@ -7,7 +7,7 @@ const getAll = async name => {
 const getBoard = async id => {
   const board = await DB.getEntity(id, 'boards');
   if (!board) {
-    process.stderr.write(`Cannot find board with id: ${id}; `);
+    process.stderr.write(`Cannot find board with id: ${id}; \n`);
   }
   return board;
 };
@@ -19,7 +19,7 @@ const createBoard = async board => {
 const updateBoard = async (id, board) => {
   const newBoard = await DB.updateEntity('boards', board, id);
   if (!newBoard) {
-    process.stderr.write(`Cannot find board with id: ${id}; `);
+    process.stderr.write(`Cannot find board with id: ${id}; \n`);
   }
   return newBoard;
 };
@@ -27,7 +27,7 @@ const updateBoard = async (id, board) => {
 const deleteBoard = async id => {
   const board = await DB.deleteEntity('boards', id);
   if (!board) {
-    process.stderr.write(`Cannot find board with id: ${id}; `);
+    process.stderr.write(`Cannot find board with id: ${id}; \n`);
   }
   DB.deleteTasks(id);
   return board;

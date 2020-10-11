@@ -7,7 +7,7 @@ const getAll = async name => {
 const getUser = async id => {
   const user = await DB.getEntity(id, 'users');
   if (!user) {
-    process.stderr.write(`Cannot find user with id: ${id}`);
+    process.stderr.write(`Cannot find user with id: ${id}; \n`);
   }
   return user;
 };
@@ -21,7 +21,7 @@ const createUser = async user => {
 const updateUser = async (id, user) => {
   const newUser = await DB.updateEntity('users', user, id);
   if (!newUser) {
-    process.stderr.write(`Cannot find user with id: ${id}`);
+    process.stderr.write(`Cannot find user with id: ${id}; \n`);
   }
   return newUser;
 };
@@ -32,7 +32,7 @@ const deleteUser = async id => {
     await DB.unassignTasks(id);
     return user;
   }
-  process.stderr.write(`Cannot find user with id: ${id}`);
+  process.stderr.write(`Cannot find user with id: ${id}; \n`);
 };
 
 module.exports = { getAll, getUser, createUser, updateUser, deleteUser };

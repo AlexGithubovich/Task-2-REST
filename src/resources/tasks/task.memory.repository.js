@@ -11,7 +11,7 @@ const getTask = async (boardId, taskId) => {
 
   const task = await tasks.find(taskLocal => taskLocal.id === taskId);
   if (!task) {
-    process.stderr.write(`Cannot find task with id: ${taskId}; `);
+    process.stderr.write(`Cannot find task with id: ${taskId}; \n`);
   }
   return task;
 };
@@ -24,7 +24,7 @@ const updateTask = async (boardId, taskId, task) => {
   const currTask = await getTask(boardId, taskId);
 
   if (!currTask) {
-    process.stderr.write(`Cannot find task with id: ${taskId}; `);
+    process.stderr.write(`Cannot find task with id: ${taskId}; \n`);
   }
 
   const newTask = { ...currTask, ...task };
@@ -37,7 +37,7 @@ const deleteTask = async (boardId, taskId) => {
   const task = await DB.deleteEntity('tasks', taskId);
 
   if (!task) {
-    process.stderr.write(`Cannot find task with id: ${taskId}; `);
+    process.stderr.write(`Cannot find task with id: ${taskId}; \n`);
   }
   return task;
 };
