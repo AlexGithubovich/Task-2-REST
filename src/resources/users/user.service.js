@@ -1,15 +1,23 @@
-const User = require('./user.model');
-
 const usersRepo = require('./user.memory.repository');
 
-const getAll = name => usersRepo.getAll(name);
+const getAll = () => usersRepo.getAll();
 
 const getUser = id => usersRepo.getUser(id);
 
-const createUser = user => usersRepo.createUser(new User(user));
+const addUser = user => {
+  if (!user.name || !user.login || !user.password) {
+    return;
+  }
+  return usersRepo.addUser(user);
+};
 
-const updateUser = (id, user) => usersRepo.updateUser(id, user);
+const updateUser = user => {
+  if (!user.name || !user.login || !user.password) {
+    return;
+  }
+  return usersRepo.updateUser(user);
+};
 
 const deleteUser = id => usersRepo.deleteUser(id);
 
-module.exports = { getAll, getUser, createUser, updateUser, deleteUser };
+module.exports = { getAll, getUser, addUser, updateUser, deleteUser };

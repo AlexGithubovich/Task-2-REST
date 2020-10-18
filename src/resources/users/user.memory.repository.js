@@ -1,38 +1,47 @@
-const DB = require('../../memoryDB');
+const User = require('./user.model');
+const { unassignTasks } = require('../tasks/task.memory.repository');
 
-const getAll = async name => {
-  return await DB.getAll(name);
+const users = [
+  new User({ name: 'name1', login: 'login1', password: 'password1' }),
+  new User({ name: 'name2', login: 'login2', password: 'password2' }),
+  new User({ name: 'name3', login: 'login3', password: 'password3' })
+];
+
+const getAll = async () => {
+  // TODO: mock implementation. should be replaced during task development
+  return users;
 };
 
 const getUser = async id => {
-  const user = await DB.getEntity(id, 'users');
-  if (!user) {
-    process.stderr.write(`Cannot find user with id: ${id}; \n`);
-  }
-  return user;
+  return (await getAll()).find(user => user.id === id);
 };
 
-const createUser = async user => {
-  const newUser = await DB.createEntity('users', user);
-
-  return newUser;
+const addUser = async user => {
+  users.push(new User(user));
+  return users[users.length - 1];
 };
 
-const updateUser = async (id, user) => {
-  const newUser = await DB.updateEntity('users', user, id);
-  if (!newUser) {
-    process.stderr.write(`Cannot find user with id: ${id}; \n`);
+const updateUser = async user => {
+  const allUsers = await getAll();
+  const userIndex = allUsers.findIndex(el => el.id === user.id);
+  if (userIndex >= 0) {
+    const oldUser = allUsers[userIndex];
+    const newUser = { ...oldUser, ...user };
+    allUsers.splice(userIndex, 1, newUser);
+    return newUser;
   }
-  return newUser;
+  return;
 };
 
 const deleteUser = async id => {
-  const user = await DB.deleteEntity('users', id);
-  if (user) {
-    await DB.unassignTasks(id);
-    return user;
+  const allUsers = await getAll();
+  const userIndex = allUsers.findIndex(el => el.id === id);
+  if (userIndex >= 0) {
+    allUsers.splice(userIndex, 1);
+    await unassignTasks(id);
+    return true;
   }
-  process.stderr.write(`Cannot find user with id: ${id}; \n`);
+  return false;
 };
 
-module.exports = { getAll, getUser, createUser, updateUser, deleteUser };
+module.exports = { getAll, getUser, addUser, updateUser, deleteUser };

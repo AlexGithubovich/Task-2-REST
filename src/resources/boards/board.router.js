@@ -1,52 +1,66 @@
 const router = require('express').Router();
-const Board = require('./board.model');
 const boardsService = require('./board.service');
+const taskRouter = require('../tasks/task.router');
+const { customError, catchError } = require('../../common/error');
 
-// Get All
-router.route('/').get(async (req, res) => {
-  const boards = await boardsService.getAll('boards');
-  // map board fields to exclude secret fields like "password"
-  res.status(200).json(boards.map(Board.toResponse));
-});
+router.use(
+  '/:id/tasks/',
+  (req, res, next) => {
+    req.boardId = req.params.id;
+    next();
+  },
+  taskRouter
+);
 
-// Get board by Id
-router.route('/:id').get(async (req, res) => {
-  const id = req.params.id;
-  const board = await boardsService.getBoard(id);
-
-  if (board) {
-    res.status(200).json(board[0]);
-  } else {
-    res.status(404).send('Board not found');
-  }
-});
-
-// Create board
-router.route('/').post(async (req, res) => {
-  const board = await boardsService.createBoard(Board.toResponse(req.body));
-
-  res.status(200).send(Board.toResponse(board));
-});
-
-// Update board
-router.route('/:id').put(async (req, res) => {
-  const id = req.params.id;
-  const updatedBoard = await boardsService.updateBoard(
-    id,
-    Board.toResponse({ ...req.body, id })
+router
+  .route('/')
+  .get(
+    catchError(async (req, res) => {
+      const boards = await boardsService.getAll();
+      res.json(boards);
+    })
+  )
+  .post(
+    catchError(async (req, res) => {
+      const newBoard = await boardsService.addBoard(req.body);
+      if (newBoard) {
+        res.json(newBoard);
+      } else {
+        throw new customError(400, 'Bad request');
+      }
+    })
   );
-  res.status(200).send(updatedBoard);
-});
 
-// Delete board
-router.route('/:id').delete(async (req, res) => {
-  const id = req.params.id;
-  const deletedBoard = await boardsService.deleteBoard(id);
+router
+  .route('/:id')
+  .get(
+    catchError(async (req, res) => {
+      const board = await boardsService.getBoard(req.params.id);
+      if (board) {
+        res.json(board);
+      } else {
+        throw new customError(404, 'Board not found');
+      }
+    })
+  )
+  .put(
+    catchError(async (req, res) => {
+      const board = await boardsService.updateBoard(req.params.id, req.body);
+      if (board) {
+        res.json(board);
+      } else {
+        throw new customError(400, 'Bad request');
+      }
+    })
+  )
+  .delete(
+    catchError(async (req, res) => {
+      if (await boardsService.deleteBoard(req.params.id)) {
+        res.status(204).end();
+      } else {
+        throw new customError(404, 'Board not found');
+      }
+    })
+  );
 
-  if (deletedBoard) {
-    res.status(200).end();
-  } else {
-    res.status(404).send('Board not found');
-  }
-});
 module.exports = router;
